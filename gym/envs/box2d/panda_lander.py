@@ -117,7 +117,7 @@ class PandaLander(gym.Env, EzPickle):
             # Nop, fire left engine, main engine, right engine
             self.action_space = spaces.Discrete(4)
 
-        self._observe_state = False
+        self._observe_state = True
         self.reset()
 
     def seed(self, seed=None):
