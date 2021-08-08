@@ -29,6 +29,7 @@ Created by Oleg Klimov. Licensed on the same terms as the rest of OpenAI Gym.
 import math
 import sys
 import numpy as np
+import random
 
 import Box2D
 from Box2D.b2 import (
@@ -91,7 +92,7 @@ class PandaLander(gym.Env, EzPickle):
 
     continuous = False
 
-    def __init__(self):
+    def __init__(self, observe_state=True, random_initial_x=False ):
         EzPickle.__init__(self)
         self.seed()
         self.viewer = None
@@ -117,7 +118,8 @@ class PandaLander(gym.Env, EzPickle):
             # Nop, fire left engine, main engine, right engine
             self.action_space = spaces.Discrete(4)
 
-        self._observe_state = True
+        self._observe_state = observe_state
+        self._random_initial_x = random_initial_x
         self.reset()
 
     def seed(self, seed=None):
@@ -177,8 +179,14 @@ class PandaLander(gym.Env, EzPickle):
         self.moon.color2 = (0.0, 0.0, 0.0)
 
         initial_y = VIEWPORT_H / SCALE
+        initial_x = VIEWPORT_W / SCALE
+        if self._random_initial_x:
+            initial_x *= random.uniform(0, 1)
+        else:
+            initial_x *= random.uniform(0, 1) *.5
+
         self.lander = self.world.CreateDynamicBody(
-            position=(VIEWPORT_W / SCALE / 2, initial_y),
+            position=(initial_x, initial_y),
             angle=0.0,
             fixtures=fixtureDef(
                 shape=polygonShape(
@@ -204,7 +212,7 @@ class PandaLander(gym.Env, EzPickle):
         self.legs = []
         for i in [-1, +1]:
             leg = self.world.CreateDynamicBody(
-                position=(VIEWPORT_W / SCALE / 2 - i * LEG_AWAY / SCALE, initial_y),
+                position=(initial_x - i * LEG_AWAY / SCALE, initial_y),
                 angle=(i * 0.05),
                 fixtures=fixtureDef(
                     shape=polygonShape(box=(LEG_W / SCALE, LEG_H / SCALE)),
@@ -385,12 +393,11 @@ class PandaLander(gym.Env, EzPickle):
         if not self.lander.awake:
             done = True
             reward = +100
-        
         if self._observe_state:
             observations = state
         else:
             observations = self.render(mode='rgb_array')    
-        return np.array(observations, dtype=np.float32), reward, done, {}
+        return observations, reward, done, {}
 
     def render(self, mode="human"):
         from gym.envs.classic_control import rendering
@@ -453,14 +460,6 @@ class PandaLander(gym.Env, EzPickle):
         if self.viewer is not None:
             self.viewer.close()
             self.viewer = None
-    
-    @property
-    def observe_state(self):
-        return self._observe_state
-    
-    @observe_state.setter
-    def observe_state(self, observe_state):
-        self._observe_state = observe_state
 
 
 class PandaLanderContinuous(PandaLander):
