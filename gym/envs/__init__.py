@@ -102,8 +102,15 @@ register(
 )
 
 register(
-    id='LunarLanderContinuous-v2',
-    entry_point='gym.envs.box2d:LunarLanderContinuous',
+    id="PandaLander-v2",
+    entry_point="gym.envs.box2d:PandaLander",
+    max_episode_steps=1000,
+    reward_threshold=200,
+)
+
+register(
+    id="LunarLanderContinuous-v2",
+    entry_point="gym.envs.box2d:LunarLanderContinuous",
     max_episode_steps=1000,
     reward_threshold=200,
 )
