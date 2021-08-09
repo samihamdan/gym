@@ -27,6 +27,7 @@ Created by Oleg Klimov. Licensed on the same terms as the rest of OpenAI Gym.
 
 
 import math
+from re import I
 import sys
 import numpy as np
 import random
@@ -104,10 +105,9 @@ class PandaLander(gym.Env, EzPickle):
 
         self.prev_reward = None
 
-        # useful range is -1 .. +1, but spikes can be higher
-        self.observation_space = spaces.Box(
-            -np.inf, np.inf, shape=(8,), dtype=np.float32
-        )
+        self._observe_state = observe_state
+        self._random_initial_x = random_initial_x
+
 
         if self.continuous:
             # Action is two floats [main engine, left-right engines].
@@ -118,9 +118,25 @@ class PandaLander(gym.Env, EzPickle):
             # Nop, fire left engine, main engine, right engine
             self.action_space = spaces.Discrete(4)
 
-        self._observe_state = observe_state
-        self._random_initial_x = random_initial_x
+        print('Test')
         self.reset()
+        if self._observe_state:
+            # useful range is -1 .. +1, but spikes can be higher
+            # self.observation_space = spaces.Box(
+            #     -np.inf, np.inf, shape=(8,), dtype=np.float32
+            # )
+            assert False
+        else:
+            print('else')
+            _picture = self.render(mode='rgb_array')
+            self.observation_space = spaces.Box(
+                _picture.min(), _picture.max(), shape=_picture.shape, 
+                dtype = _picture.dtype
+
+            )
+        print(self.observation_space.shape)
+        
+        self.reset
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -183,7 +199,7 @@ class PandaLander(gym.Env, EzPickle):
         if self._random_initial_x:
             initial_x *= random.uniform(0, 1)
         else:
-            initial_x *= random.uniform(0, 1) *.5
+            initial_x *= .5
 
         self.lander = self.world.CreateDynamicBody(
             position=(initial_x, initial_y),
