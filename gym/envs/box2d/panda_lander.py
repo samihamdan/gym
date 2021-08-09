@@ -93,7 +93,7 @@ class PandaLander(gym.Env, EzPickle):
 
     continuous = False
 
-    def __init__(self, observe_state=True, random_initial_x=False ):
+    def __init__(self, observe_state=True, random_initial_x=False):
         EzPickle.__init__(self)
         self.seed()
         self.viewer = None
@@ -108,7 +108,6 @@ class PandaLander(gym.Env, EzPickle):
         self._observe_state = observe_state
         self._random_initial_x = random_initial_x
 
-
         if self.continuous:
             # Action is two floats [main engine, left-right engines].
             # Main engine: -1..0 off, 0..+1 throttle from 50% to 100% power. Engine can't work with less than 50% power.
@@ -118,24 +117,22 @@ class PandaLander(gym.Env, EzPickle):
             # Nop, fire left engine, main engine, right engine
             self.action_space = spaces.Discrete(4)
 
-        print('Test')
         self.reset()
         if self._observe_state:
             # useful range is -1 .. +1, but spikes can be higher
-            # self.observation_space = spaces.Box(
-            #     -np.inf, np.inf, shape=(8,), dtype=np.float32
-            # )
-            assert False
-        else:
-            print('else')
-            _picture = self.render(mode='rgb_array')
             self.observation_space = spaces.Box(
-                _picture.min(), _picture.max(), shape=_picture.shape, 
-                dtype = _picture.dtype
-
+                -np.inf, np.inf, shape=(8,), dtype=np.float32
+            )
+        else:
+            _picture = self.render(mode="rgb_array")
+            self.observation_space = spaces.Box(
+                _picture.min(),
+                _picture.max(),
+                shape=_picture.shape,
+                dtype=_picture.dtype,
             )
         print(self.observation_space.shape)
-        
+
         self.reset
 
     def seed(self, seed=None):
@@ -199,7 +196,7 @@ class PandaLander(gym.Env, EzPickle):
         if self._random_initial_x:
             initial_x *= random.uniform(0, 1)
         else:
-            initial_x *= .5
+            initial_x *= 0.5
 
         self.lander = self.world.CreateDynamicBody(
             position=(initial_x, initial_y),
@@ -412,7 +409,7 @@ class PandaLander(gym.Env, EzPickle):
         if self._observe_state:
             observations = state
         else:
-            observations = self.render(mode='rgb_array')    
+            observations = self.render(mode="rgb_array").copy()
         return observations, reward, done, {}
 
     def render(self, mode="human"):
