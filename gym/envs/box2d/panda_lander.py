@@ -131,8 +131,6 @@ class PandaLander(gym.Env, EzPickle):
                 shape=_picture.shape,
                 dtype=_picture.dtype,
             )
-        print(self.observation_space.shape)
-
         self.reset()
 
     def seed(self, seed=None):
