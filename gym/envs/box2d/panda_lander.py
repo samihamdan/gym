@@ -133,7 +133,7 @@ class PandaLander(gym.Env, EzPickle):
             )
         print(self.observation_space.shape)
 
-        self.reset
+        self.reset()
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
