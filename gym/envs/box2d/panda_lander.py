@@ -31,6 +31,7 @@ from re import I
 import sys
 import numpy as np
 import random
+from torchvision import transforms
 
 import Box2D
 from Box2D.b2 import (
@@ -93,7 +94,10 @@ class PandaLander(gym.Env, EzPickle):
 
     continuous = False
 
-    def __init__(self, observe_state=True, random_initial_x=False):
+    def __init__(self,
+                observe_state=True, random_initial_x=False,
+                image_transformers=transforms.ToTensor()
+                ):
         EzPickle.__init__(self)
         self.seed()
         self.viewer = None
@@ -107,6 +111,7 @@ class PandaLander(gym.Env, EzPickle):
 
         self._observe_state = observe_state
         self._random_initial_x = random_initial_x
+        self._image_transformers = image_transformers
 
         if self.continuous:
             # Action is two floats [main engine, left-right engines].
@@ -125,6 +130,8 @@ class PandaLander(gym.Env, EzPickle):
             )
         else:
             _picture = self.render(mode="rgb_array")
+            _picture = self._image_transformers(_picture.copy()).numpy()
+            
             self.observation_space = spaces.Box(
                 _picture.min(),
                 _picture.max(),
@@ -408,6 +415,8 @@ class PandaLander(gym.Env, EzPickle):
             observations = state
         else:
             observations = self.render(mode="rgb_array").copy()
+            observations = self._image_transformers(observations).numpy()
+
         return observations, reward, done, {}
 
     def render(self, mode="human"):
