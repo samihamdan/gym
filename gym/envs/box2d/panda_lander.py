@@ -199,7 +199,11 @@ class PandaLander(gym.Env, EzPickle):
         initial_y = VIEWPORT_H / SCALE
         initial_x = VIEWPORT_W / SCALE
         if self._random_initial_x:
-            initial_x *= random.uniform(0, 1)
+            width = initial_x
+            initial_x *= random.uniform(0.01, .99)
+            # 40 as without lander is 17*2 and we add some to be safe
+            initial_x = max(40/SCALE, min(width-40/SCALE, initial_x))
+            
         else:
             initial_x *= 0.5
 
